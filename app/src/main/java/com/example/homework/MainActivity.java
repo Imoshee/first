@@ -17,9 +17,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView textView;
     private Button startButton;
     private Button stopButton;
+    private Button resetButton;
+
     private Handler handler;
     private Runnable runnable;
-    private int count = 0;
+
+    private int seconds = 0;
+    private int minutes = 0;
     private boolean isRunning = false;
 
     @Override
@@ -30,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView);
         startButton = findViewById(R.id.button);
         stopButton = findViewById(R.id.button2);
+        resetButton = findViewById(R.id.button3);
         handler = new Handler();
 
         startButton.setOnClickListener(new View.OnClickListener() {
@@ -40,8 +45,12 @@ public class MainActivity extends AppCompatActivity {
                     runnable = new Runnable() {
                         @Override
                         public void run() {
-                            count++;
-                            textView.setText(String.valueOf(count));
+                            seconds++;
+                            if (seconds == 60) {
+                                seconds = 0;
+                                minutes++;
+                            }
+                            updateTextView();
                             if (isRunning) {
                                 handler.postDelayed(this, 1000);
                             }
@@ -59,5 +68,21 @@ public class MainActivity extends AppCompatActivity {
                 handler.removeCallbacks(runnable);
             }
         });
+
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isRunning = false;
+                handler.removeCallbacks(runnable);
+                seconds = 0;
+                minutes = 0;
+                updateTextView();
+            }
+        });
+    }
+
+    private void updateTextView() {
+        String time = String.format("%02d:%02d", minutes, seconds);
+        textView.setText(time);
     }
 }
